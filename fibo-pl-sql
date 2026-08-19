@@ -1,22 +1,56 @@
+CREATE TABLE Employee (
+    Emp_ID NUMBER PRIMARY KEY,
+    Emp_Name VARCHAR2(50),
+    Salary NUMBER(10,2)
+);
+
+INSERT INTO Employee VALUES (101, 'Arun', 25000);
+INSERT INTO Employee VALUES (102, 'Bala', 40000);
+INSERT INTO Employee VALUES (103, 'Chitra', 60000);
+
+SELECT * FROM Employee;
+
 SET SERVEROUTPUT ON;
 
 DECLARE
-    n NUMBER := 10;
-    a NUMBER := 0;
-    b NUMBER := 1;
-    c NUMBER;
-    i NUMBER;
+    v_emp_id Employee.Emp_ID%TYPE := 102;
+    v_name Employee.Emp_Name%TYPE;
+    v_salary Employee.Salary%TYPE;
+    v_new_salary NUMBER(10,2);
 BEGIN
-    DBMS_OUTPUT.PUT_LINE('Fibonacci Series:');
+    SELECT Emp_Name, Salary
+    INTO v_name, v_salary
+    FROM Employee
+    WHERE Emp_ID = v_emp_id;
 
-    FOR i IN 1..n LOOP
-        DBMS_OUTPUT.PUT(a || ' ');
+    IF v_salary < 30000 THEN
+        v_new_salary := v_salary * 1.15;
+    ELSIF v_salary <= 50000 THEN
+        v_new_salary := v_salary * 1.10;
+    ELSE
+        v_new_salary := v_salary * 1.05;
+    END IF;
 
-        c := a + b;
-        a := b;
-        b := c;
-    END LOOP;
+    -- Display old and new salary
+    DBMS_OUTPUT.PUT_LINE('Employee ID   : ' || v_emp_id);
+    DBMS_OUTPUT.PUT_LINE('Employee Name : ' || v_name);
+    DBMS_OUTPUT.PUT_LINE('Old Salary    : ' || v_salary);
+    DBMS_OUTPUT.PUT_LINE('New Salary    : ' || v_new_salary);
 
-    DBMS_OUTPUT.NEW_LINE;
+    -- Update salary in Employee table
+    UPDATE Employee
+    SET Salary = v_new_salary
+    WHERE Emp_ID = v_emp_id;
+
+    COMMIT;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Employee not found.');
 END;
 /
+
+-- View the updated employee record
+SELECT * 
+FROM Employee;
+--WHERE Emp_ID = 102;
